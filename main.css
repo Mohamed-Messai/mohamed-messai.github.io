@@ -1,11 +1,6 @@
 @import url("fontawesome-all.min.css");
 @import url("https://fonts.googleapis.com/css?family=Lato:400,400italic,700,700italic|Source+Code+Pro:400");
 
-/*
-	Read Only by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-*/
 #bio {
 	text-align: justify;
 	/*font-family: cursive ;*/
@@ -2854,6 +2849,7 @@ input, select, textarea {
 		color: #c0c0c0;
 		overflow: hidden;
 		padding: 4em 0 2em 0;
+		text-align:center;
 	}
 
 		#footer .copyright {
@@ -2868,6 +2864,7 @@ input, select, textarea {
 				font-size: 0.8em;
 				margin-left: auto; /*1em;*/
 				padding-left: 1em;
+				text-align: center;
 			}
 
 				#footer .copyright li:first-child {
