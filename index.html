@@ -1,0 +1,904 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Mohamed-Lamine MESSAI</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--<script>alert("Les dimensions de votre écran sont :" + screen.width+ " x " + screen.height);</script>-->
+		<script src='script.js'></script>
+		
+		<script>
+			var colours=new Array("#a6f", "#60f", "#60f", "#a6f", "#ccc"); // colours for top, right, bottom and left borders and background of bubbles
+			var bubbles=66; // maximum number of bubbles on screen
+			var over_or_under="over"; // set to "over" for bubbles to always be on top, or "under" to allow them to float behind other objects
+			
+			/****************************
+			* JavaScript Bubble Cursor  *
+			*(c)2010-13 mf2fm web-design*
+			*  http://www.mf2fm.com/rv  *
+			* DON'T EDIT BELOW THIS BOX *
+			****************************/
+			var x=ox=400;
+			var y=oy=300;
+			var swide=800;
+			var shigh=600;
+			var sleft=sdown=0;
+			var bubb=new Array();
+			var bubbx=new Array();
+			var bubby=new Array();
+			var bubbs=new Array();
+			var sploosh=false;
+			
+			function addLoadEvent(funky) {
+			  var oldonload=window.onload;
+			  if (typeof(oldonload)!='function') window.onload=funky;
+			  else window.onload=function() {
+				if (oldonload) oldonload();
+				funky();
+			  }
+			}
+			
+			addLoadEvent(buble);
+			
+			function buble() { if (document.getElementById) {
+			  var i, rats, div;
+			  for (i=0; i<bubbles; i++) {
+				rats=createDiv("3px", "3px");
+				rats.style.visibility="hidden";
+				rats.style.zIndex=(over_or_under=="over")?"1001":"0";
+			
+				div=createDiv("auto", "auto");
+				rats.appendChild(div);
+				div=div.style;
+				div.top="1px";
+				div.left="0px";
+				div.bottom="1px";
+				div.right="0px";
+				div.borderLeft="1px solid "+colours[3];
+				div.borderRight="1px solid "+colours[1];
+			
+				div=createDiv("auto", "auto");
+				rats.appendChild(div);
+				div=div.style;
+				div.top="0px";
+				div.left="1px";
+				div.right="1px";
+				div.bottom="0px"
+				div.borderTop="1px solid "+colours[0];
+				div.borderBottom="1px solid "+colours[2];
+			
+				div=createDiv("auto", "auto");
+				rats.appendChild(div);
+				div=div.style;
+				div.left="1px";
+				div.right="1px";
+				div.bottom="1px";
+				div.top="1px";
+				div.backgroundColor=colours[4];
+				if (navigator.appName=="Microsoft Internet Explorer") div.filter="alpha(opacity=50)";
+				else div.opacity=0.5;
+				document.body.appendChild(rats);
+				bubb[i]=rats.style;
+			  }
+			  set_scroll();
+			  set_width();
+			  bubble();
+			}}
+			
+			function bubble() {
+			  var c;
+			  if (Math.abs(x-ox)>1 || Math.abs(y-oy)>1) {
+				ox=x;
+				oy=y;
+				for (c=0; c<bubbles; c++) if (!bubby[c]) {
+				  bubb[c].left=(bubbx[c]=x)+"px";
+				  bubb[c].top=(bubby[c]=y-3)+"px";
+				  bubb[c].width="3px";
+				  bubb[c].height="3px"
+				  bubb[c].visibility="visible";
+				  bubbs[c]=3;
+				  break;
+				}
+			  }
+			  for (c=0; c<bubbles; c++) if (bubby[c]) update_bubb(c);
+			  setTimeout("bubble()", 40);
+			}
+			
+			document.onmousedown=splash;
+			document.onmouseup=function(){clearTimeout(sploosh);};
+			
+			function splash() {
+			  ox=-1;
+			  oy=-1;
+			  sploosh=setTimeout('splash()', 100);
+			}
+			
+			function update_bubb(i) {
+			  if (bubby[i]) {
+				bubby[i]-=bubbs[i]/2+i%2;
+				bubbx[i]+=(i%5-2)/5;
+				if (bubby[i]>sdown && bubbx[i]>sleft && bubbx[i]<sleft+swide+bubbs[i]) {
+				  if (Math.random()<bubbs[i]/shigh*2 && bubbs[i]++<8) {
+					bubb[i].width=bubbs[i]+"px";
+					bubb[i].height=bubbs[i]+"px";
+				  }
+				  bubb[i].top=bubby[i]+"px";
+				  bubb[i].left=bubbx[i]+"px";
+				}
+				else {
+				  bubb[i].visibility="hidden";
+				  bubby[i]=0;
+				  return;
+				}
+			  }
+			}
+			
+			document.onmousemove=mouse;
+			function mouse(e) {
+			  if (e) {
+				y=e.pageY;
+				x=e.pageX;
+			  }
+			  else {
+				set_scroll();
+				y=event.y+sdown;
+				x=event.x+sleft;
+			  }
+			}
+			
+			window.onresize=set_width;
+			function set_width() {
+			  var sw_min=999999;
+			  var sh_min=999999;
+			  if (document.documentElement && document.documentElement.clientWidth) {
+				if (document.documentElement.clientWidth>0) sw_min=document.documentElement.clientWidth;
+				if (document.documentElement.clientHeight>0) sh_min=document.documentElement.clientHeight;
+			  }
+			  if (typeof(self.innerWidth)=='number' && self.innerWidth) {
+				if (self.innerWidth>0 && self.innerWidth<sw_min) sw_min=self.innerWidth;
+				if (self.innerHeight>0 && self.innerHeight<sh_min) sh_min=self.innerHeight;
+			  }
+			  if (document.body.clientWidth) {
+				if (document.body.clientWidth>0 && document.body.clientWidth<sw_min) sw_min=document.body.clientWidth;
+				if (document.body.clientHeight>0 && document.body.clientHeight<sh_min) sh_min=document.body.clientHeight;
+			  }
+			  if (sw_min==999999 || sh_min==999999) {
+				sw_min=800;
+				sh_min=600;
+			  }
+			  swide=sw_min;
+			  shigh=sh_min;
+			}
+			
+			window.onscroll=set_scroll;
+			function set_scroll() {
+			  if (typeof(self.pageYOffset)=='number') {
+				sdown=self.pageYOffset;
+				sleft=self.pageXOffset;
+			  }
+			  else if (document.body && (document.body.scrollTop || document.body.scrollLeft)) {
+				sdown=document.body.scrollTop;
+				sleft=document.body.scrollLeft;
+			  }
+			  else if (document.documentElement && (document.documentElement.scrollTop || document.documentElement.scrollLeft)) {
+				sleft=document.documentElement.scrollLeft;
+				sdown=document.documentElement.scrollTop;
+			  }
+			  else {
+				sdown=0;
+				sleft=0;
+			  }
+			}
+			
+			function createDiv(height, width) {
+			  var div=document.createElement("div");
+			  div.style.position="absolute";
+			  div.style.height=height;
+			  div.style.width=width;
+			  div.style.overflow="hidden";
+			  div.style.backgroundColor="transparent";
+			  return (div);
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			/*var smokeyness=100; // how much smoke is on the screen (more will slow the script down)
+			var density=40; // how 'big' is the smoke
+			
+			/****************************
+			* JavaScript Smokey Cursor  *
+			* (c)2013 mf2fm web-design  *
+			*  http://www.mf2fm.com/rv  *
+			* DON'T EDIT BELOW THIS BOX *
+			****************************/
+			
+			/*var swide=800;
+			var shigh=600;
+			var toke=new Array();
+			var tokex=new Array();
+			var tokedx=new Array();
+			var tokey=new Array();
+			var nicotine=new Array();
+			var mousedown=false;
+			var x=400;
+			var y=300;
+			var sleft=sdown=0;
+			var ie_version=(navigator.appVersion.indexOf("MSIE")!=-1)?parseFloat(navigator.appVersion.split("MSIE")[1]):false;
+			
+			function addLoadEvent(funky) {
+			  var oldonload=window.onload;
+			  if (typeof(oldonload)!='function') window.onload=funky;
+			  else window.onload=function() {
+				if (oldonload) oldonload();
+				funky();
+			  }
+			}
+			
+			addLoadEvent(puff);
+			
+			function puff() { if (document.getElementById) {
+			  var i, fag;
+			  for (i=0; i<smokeyness; i++) {
+				fag=document.createElement("div");
+				toke[i]=fag.style;
+				toke[i].position="absolute";
+				toke[i].backgroundColor="transparent";
+				toke[i].font="bold "+density+"px Tahoma, Geneva, sans-serif";
+				toke[i].color="rgba(234,234,234,0.033)";
+				toke[i].zIndex="9999";
+				toke[i].pointerEvents="none";
+				toke[i].visibility="hidden";
+				fag.appendChild(document.createTextNode(String.fromCharCode('0x25CF')));
+			
+				document.body.appendChild(fag);
+				tokey[i]=false;
+			  }
+			  set_scroll();
+			  set_width();
+			  setInterval(drag, 50);
+			}}
+			
+			function drag() {
+			  var c;
+			  if (mousedown) for (c=0; c<smokeyness; c++) if (tokey[c]===false) {
+				toke[c].left=(tokex[c]=x-density/2)+"px";
+				toke[c].top=(tokey[c]=y-density)+"px";
+				toke[c].visibility="visible";
+				tokedx[c]=(c%2?1.5:-1.5)*Math.random();
+				nicotine[c]=80;
+				break;
+			  }
+			  for (c=0; c<smokeyness; c++) if (tokey[c]!==false) smoke_rising(c);
+			}
+			
+			
+			document.onmousedown=function(){set_scroll();if(ie_version)setTimeout('mousedown=true', 51);else mousedown=true;};
+			document.onmouseup=function(){mousedown=false};
+			
+			function smoke_rising(i) {
+			  var cancer;
+			  tokey[i]-=4+i%3;
+			  tokex[i]+=tokedx[i]-0.5+Math.random();
+			  if (tokey[i]>sdown-density*2 && tokex[i]>sleft && tokex[i]<sleft+swide-density && (nicotine[i]+=2)<256) {
+				cancer=nicotine[i].toString(16);
+				cancer="#"+cancer+cancer+cancer;
+				if (ie_version && ie_version<10) toke[i].filter="Glow(Color="+cancer+",Strength="+Math.floor(nicotine[i]/5)+")";
+				else if (ie_version) toke[i].textShadow='#000000 0px 0px '+Math.floor(nicotine[i]/5)+'px';
+				else toke[i].textShadow=cancer+' 0px 0px '+Math.floor(nicotine[i]/5)+'px';
+				toke[i].top=tokey[i]+"px";
+				toke[i].left=tokex[i]+"px";
+			  }
+			  else {
+				toke[i].visibility="hidden";
+				tokey[i]=false;
+			  }
+			}
+			
+			document.onmousemove=mouse;
+			function mouse(e) {
+			  if (e) {
+				y=e.pageY;
+				x=e.pageX;
+			  }
+			  else {
+				set_scroll();
+				y=event.y+sdown;
+				x=event.x+sleft;
+			  }
+			}
+			
+			window.onresize=set_width;
+			function set_width() {
+			  var sw_min=999999;
+			  var sh_min=999999;
+			  if (document.documentElement && document.documentElement.clientWidth) {
+				if (document.documentElement.clientWidth>0) sw_min=document.documentElement.clientWidth;
+				if (document.documentElement.clientHeight>0) sh_min=document.documentElement.clientHeight;
+			  }
+			  if (typeof(self.innerWidth)=='number' && self.innerWidth) {
+				if (self.innerWidth>0 && self.innerWidth<sw_min) sw_min=self.innerWidth;
+				if (self.innerHeight>0 && self.innerHeight<sh_min) sh_min=self.innerHeight;
+			  }
+			  if (document.body.clientWidth) {
+				if (document.body.clientWidth>0 && document.body.clientWidth<sw_min) sw_min=document.body.clientWidth;
+				if (document.body.clientHeight>0 && document.body.clientHeight<sh_min) sh_min=document.body.clientHeight;
+			  }
+			  if (sw_min==999999 || sh_min==999999) {
+				sw_min=800;
+				sh_min=600;
+			  }
+			  swide=sw_min;
+			  shigh=sh_min;
+			}
+			
+			window.onscroll=set_scroll;
+			function set_scroll() {
+			  if (typeof(self.pageYOffset)=='number') {
+				sdown=self.pageYOffset;
+				sleft=self.pageXOffset;
+			  }
+			  else if (document.body && (document.body.scrollTop || document.body.scrollLeft)) {
+				sdown=document.body.scrollTop;
+				sleft=document.body.scrollLeft;
+			  }
+			  else if (document.documentElement && (document.documentElement.scrollTop || document.documentElement.scrollLeft)) {
+				sleft=document.documentElement.scrollLeft;
+				sdown=document.documentElement.scrollTop;
+			  }
+			  else {
+				sdown=0;
+				sleft=0;
+			  }
+			} */
+			</script>
+			
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<section id="header">
+				<header>
+					<span class="image avatar"><img src="images/network.jpg" alt="" /></span>
+					<h1 id="logo"><a href="#">Mohamed-Lamine MESSAI</a></h1>
+					<p>Ph.D. in Computer Science / Docteur en informatique<br />
+					<!--Enseignant-Chercheur-->Associate professor @ <a href="https://www.cpe.fr/">CPE LYON</a>   </p> 
+					
+				</header>
+				<nav id="nav">
+					<ul>
+						<li><a href="#one" class="active">About me</a></li>
+						<li><a href="#two">Teaching</a></li>
+						<li><a href="#three">Research</a></li>
+						<li><a href="#three+">Publications</a></li>
+						<li><a href="#four">Contact</a></li>
+					</ul>
+				</nav>
+				<footer>
+					<ul class="icons">
+						<li><a href="https://scholar.google.com/citations?user=t65uHnkAAAAJ&hl=fr" class="icon brands fa fa-google" target="_blank"><span class="label">Google</span></a></li>
+						<li><a href="https://fr.linkedin.com/in/mohamed-lamine-messai-44a4b050" class="icon brands fa fa-linkedin" target="_blank"><span class="label">Google</span></a></li>
+						<li><a href="https://github.com/Mohamed-Messai" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+						<li><a href="https://twitter.com/messaiamine" class="icon brands fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
+						<li><a href="https://www.researchgate.net/profile/Mohamed_Lamine_Messai" class="icon brands fa-researchgate" target="_blank"><span class="label">ResearchGate</span></a></li>
+						<!--<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>-->
+						<!--<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>-->
+						<!--<li><a href="mailto:mohamed-lamine.messai@cpe.fr" class="icon solid fa-envelope"><span class="label">Email</span></a></li>-->
+					</ul>
+				</footer>
+			</section>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+			
+				<!-- Main -->
+					<div id="main">
+
+						<!-- One -->
+							<section id="one">
+								<div class="image main" data-position="center">
+									<img src="images/logo.jpg" alt="" />
+								</div>
+								<div class="container">
+									<header class="major">
+										<h2>Short bio</h2>
+										<p id="bio">I joined the <a href="https://www.cpe.fr/ " target="_blank">CPE engineering school</a> in September 2019. From 2016 to 2019, I was a Temporary 
+											Lecturer and Research Assistant at the <a href="https://www.univ-lyon2.fr/" target="_blank">university Lumière Lyon 2</a> and <a href="https://eric.msh-lse.fr/" target="_blank">ERIC laboritory</a>. I received my Ph.D. in computer science from 
+											the  <a href="http://univ-bejaia.dz/" target="_blank">university of Bejaia</a> and the <a href="https://www.univ-lyon1.fr/" target="_blank">university Claude Bernard Lyon 1 </a> in 2016. 
+											I have a "Magistère" degree from the <a href="http://univ-bejaia.dz/" target="_blank">university of Bejaia</a> and an engeneer degree in artifical intellegence from the <a href="https://www.univ-setif.dz/" target="_blank">university of Sétif</a>.<br /></p>
+									</header>
+									<!--<p>Faucibus sed lobortis aliquam lorem blandit. Lorem eu nunc metus col. Commodo id in arcu ante lorem ipsum sed accumsan erat praesent faucibus commodo ac mi lacus.
+										 Adipiscing mi ac commodo. Vis aliquet tortor ultricies non ante erat nunc integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer non.
+										  Adipiscing cubilia elementum.</p>-->
+								</div>
+							</section>
+
+						<!-- Two -->
+							<section id="two">
+								<div class="container">
+									<h2>Teaching</h2>
+									<h3>Current</h3>
+									<p>I teach the following courses. All course materials are on the <a href="https://sso.cpe.fr/cas/login?service=https%3A%2F%2Foga.cpe.fr%2F" target="_blank">e-campus</a> (authentication required). </p>
+									<ul class="feature-icons">
+										<li class="icon solid fa-lock">Computer security</li>
+										<li class="icon solid fa-database">Information systems modeling</li>
+										<li class="icon solid fa-book">C programming language</li>
+										<li class="icon solid fa-cog">Web programming</li>
+										<li class="icon solid fa-desktop">Networking</li>
+										<!--<li class="icon solid fa-users">Shadow clone technique</li>-->
+									</ul>
+									<h3>Former</h3>
+									<ul class="feature-icons">
+										<li class="icon solid fa-database">Advanced databases</li>
+										<li class="icon solid fa-database">NoSQL data models</li>
+										<li class="icon solid fa-keyboard">TIC</li>
+									</ul>
+								</div>
+							</section>
+
+						<!-- Three -->
+							<section id="three">
+								<div class="container">
+									<h2>Research</h2>
+									<!--<p>I'm a member of the........ team of the .....</p>-->
+									<div class="features">
+										<article>
+											<a href="#" class="image"><img src="images/res1.jpeg" alt="" /></a>
+											<div class="inner">
+												<h4>Research interests</h4>
+												
+													<ul> 
+														<li>Wireless Sensor Networks (WSNs) </li>
+														<li>Key management systems</li> 
+														<li>Security issues in Networking</li>
+														<li>Cryptography</li>
+														<li>Resource-Constrained Networks</li>
+														<li>Internet of Things</li>
+													</ul>
+												
+											</div>
+										</article>
+										<!--<article>
+											<a href="#" class="image"><img src="images/pic02.jpg" alt="" /></a>
+											<div class="inner">
+												<h4>Terraformed a small moon</h4>
+												<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer adipiscing ornare amet.</p>
+											</div>
+										</article>
+										<article>
+											<a href="#" class="image"><img src="images/pic03.jpg" alt="" /></a>
+											<div class="inner">
+												<h4>Snapped dark matter in the wild</h4>
+												<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer adipiscing ornare amet.</p>
+											</div>
+										</article> -->
+									</div>
+								</div>
+							</section>
+						
+						<!-- Three+ -->
+						<section id="three+">
+							<div class="container">
+								<h2>Publications</h2>
+								<p>Most my publications are indexed on <a
+									href="https://dblp.org/pid/20/9245.html" target="_blank">DBLP</a>,&nbsp; <a
+									href="https://www.researchgate.net/profile/Mohamed_Lamine_Messai" target="_blank">ResearchGate</a>, &nbsp;and <a href="https://scholar.google.com/citations?user=t65uHnkAAAAJ&hl=en" target="_blank"> &nbsp;Google Scholar.</a></p>
+								<!--<div class="features">
+									<article>
+										<a href="#" class="image"><img src="images/pic01.jpg" alt="" /></a>
+										<div class="inner">
+											<h4>Possibly broke spacetime</h4>
+											<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer adipiscing ornare amet.</p>
+										</div>
+									</article>
+									<article>
+										<a href="#" class="image"><img src="images/pic02.jpg" alt="" /></a>
+										<div class="inner">
+											<h4>Terraformed a small moon</h4>
+											<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer adipiscing ornare amet.</p>
+										</div>
+									</article>
+									<article>
+										<a href="#" class="image"><img src="images/pic03.jpg" alt="" /></a>
+										<div class="inner">
+											<h4>Snapped dark matter in the wild</h4>
+											<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer adipiscing ornare amet.</p>
+										</div>
+									</article>
+								</div> -->
+							</div>
+						</section>
+
+						<!-- Four -->
+							<section id="four">
+								<div class="container">
+									<h2><i class="fas fa-address-card"></i> Contact </h2>
+									<address>Campus Lyontech <br> 3 Rue Victor Grignard, 69100. <br>Villeurbanne, France.</address>
+									<a href="mailto:mohamed-lamine.messai@cpe.fr">mohamed-lamine.messai(at)cpe.fr</a> <hr>
+									<iframe id="map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2782.3649559882642!2d4.86620511582403!3d45.78391572007334!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47f4eb33b5ba6d29%3A0x995ce4d954d33533!2s3%20Rue%20Victor%20Grignard%2C%2069100%20Villeurbanne!5e0!3m2!1sfr!2sfr!4v1598344472173!5m2!1sfr!2sfr" allow="fullscreen" ></iframe>
+									<!--<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer non. Adipiscing cubilia elementum integer. Integer eu ante ornare amet commetus.</p>
+									<form method="post" action="#">
+										<div class="row gtr-uniform">
+											<div class="col-6 col-12-xsmall"><input type="text" name="name" id="name" placeholder="Name" /></div>
+											<div class="col-6 col-12-xsmall"><input type="email" name="email" id="email" placeholder="Email" /></div>
+											<div class="col-12"><input type="text" name="subject" id="subject" placeholder="Subject" /></div>
+											<div class="col-12"><textarea name="message" id="message" placeholder="Message" rows="6"></textarea></div>
+											<div class="col-12">
+												<ul class="actions">
+													<li><input type="submit" class="primary" value="Send Message" /></li>
+													<li><input type="reset" value="Reset Form" /></li>
+												</ul>
+											</div>
+										</div>
+									</form> -->
+								</div>
+							</section>
+
+						<!-- Five -->
+						<!--
+							<section id="five">
+								<div class="container">
+									<h3>Elements</h3>
+
+									<section>
+										<h4>Text</h4>
+										<p>This is <b>bold</b> and this is <strong>strong</strong>. This is <i>italic</i> and this is <em>emphasized</em>.
+										This is <sup>superscript</sup> text and this is <sub>subscript</sub> text.
+										This is <u>underlined</u> and this is code: <code>for (;;) { ... }</code>. Finally, <a href="#">this is a link</a>.</p>
+										<hr />
+										<header>
+											<h4>Heading with a Subtitle</h4>
+											<p>Lorem ipsum dolor sit amet nullam id egestas urna aliquam</p>
+										</header>
+										<p>Nunc lacinia ante nunc ac lobortis. Interdum adipiscing gravida odio porttitor sem non mi integer non faucibus ornare mi ut ante amet placerat aliquet. Volutpat eu sed ante lacinia sapien lorem accumsan varius montes viverra nibh in adipiscing blandit tempus accumsan.</p>
+										<header>
+											<h5>Heading with a Subtitle</h5>
+											<p>Lorem ipsum dolor sit amet nullam id egestas urna aliquam</p>
+										</header>
+										<p>Nunc lacinia ante nunc ac lobortis. Interdum adipiscing gravida odio porttitor sem non mi integer non faucibus ornare mi ut ante amet placerat aliquet. Volutpat eu sed ante lacinia sapien lorem accumsan varius montes viverra nibh in adipiscing blandit tempus accumsan.</p>
+										<hr />
+										<h2>Heading Level 2</h2>
+										<h3>Heading Level 3</h3>
+										<h4>Heading Level 4</h4>
+										<h5>Heading Level 5</h5>
+										<h6>Heading Level 6</h6>
+										<hr />
+										<h5>Blockquote</h5>
+										<blockquote>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan faucibus. Vestibulum ante ipsum primis in faucibus lorem ipsum dolor sit amet nullam adipiscing eu felis.</blockquote>
+										<h5>Preformatted</h5>
+										<pre><code>i = 0;
+
+while (!deck.isInOrder()) {
+    print 'Iteration ' + i;
+    deck.shuffle();
+    i++;
+}
+
+print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
+									</section>
+
+									<section>
+										<h4>Lists</h4>
+										<div class="row">
+											<div class="col-6 col-12-xsmall">
+												<h5>Unordered</h5>
+												<ul>
+													<li>Dolor pulvinar etiam magna etiam.</li>
+													<li>Sagittis adipiscing lorem eleifend.</li>
+													<li>Felis enim feugiat dolore viverra.</li>
+												</ul>
+												<h5>Alternate</h5>
+												<ul class="alt">
+													<li>Dolor pulvinar etiam magna etiam.</li>
+													<li>Sagittis adipiscing lorem eleifend.</li>
+													<li>Felis enim feugiat dolore viverra.</li>
+												</ul>
+											</div>
+											<div class="col-6 col-12-xsmall">
+												<h5>Ordered</h5>
+												<ol>
+													<li>Dolor pulvinar etiam magna etiam.</li>
+													<li>Etiam vel felis at lorem sed viverra.</li>
+													<li>Felis enim feugiat dolore viverra.</li>
+													<li>Dolor pulvinar etiam magna etiam.</li>
+													<li>Etiam vel felis at lorem sed viverra.</li>
+													<li>Felis enim feugiat dolore viverra.</li>
+												</ol>
+												<h5>Icons</h5>
+												<ul class="icons">
+													<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+													<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+													<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+													<li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
+													<li><a href="#" class="icon brands fa-dribbble"><span class="label">Dribbble</span></a></li>
+													<li><a href="#" class="icon brands fa-tumblr"><span class="label">Tumblr</span></a></li>
+												</ul>
+											</div>
+										</div>
+										<h5>Actions</h5>
+										<ul class="actions">
+											<li><a href="#" class="button primary">Default</a></li>
+											<li><a href="#" class="button">Default</a></li>
+											<li><a href="#" class="button alt">Default</a></li>
+										</ul>
+										<ul class="actions small">
+											<li><a href="#" class="button primary small">Small</a></li>
+											<li><a href="#" class="button small">Small</a></li>
+											<li><a href="#" class="button alt small">Small</a></li>
+										</ul>
+										<div class="row">
+											<div class="col-3 col-6-medium col-12-xsmall">
+												<ul class="actions stacked">
+													<li><a href="#" class="button primary">Default</a></li>
+													<li><a href="#" class="button">Default</a></li>
+													<li><a href="#" class="button alt">Default</a></li>
+												</ul>
+											</div>
+											<div class="col-3 col-6 col-12-xsmall">
+												<ul class="actions stacked">
+													<li><a href="#" class="button primary small">Small</a></li>
+													<li><a href="#" class="button small">Small</a></li>
+													<li><a href="#" class="button alt small">Small</a></li>
+												</ul>
+											</div>
+											<div class="col-3 col-6-medium col-12-xsmall">
+												<ul class="actions stacked">
+													<li><a href="#" class="button primary fit">Default</a></li>
+													<li><a href="#" class="button fit">Default</a></li>
+													<li><a href="#" class="button alt fit">Default</a></li>
+												</ul>
+											</div>
+											<div class="col-3 col-6-medium col-12-xsmall">
+												<ul class="actions stacked">
+													<li><a href="#" class="button primary small fit">Small</a></li>
+													<li><a href="#" class="button small fit">Small</a></li>
+													<li><a href="#" class="button alt small fit">Small</a></li>
+												</ul>
+											</div>
+										</div>
+									</section>
+
+									<section>
+										<h4>Table</h4>
+										<h5>Default</h5>
+										<div class="table-wrapper">
+											<table>
+												<thead>
+													<tr>
+														<th>Name</th>
+														<th>Description</th>
+														<th>Price</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>Item One</td>
+														<td>Ante turpis integer aliquet porttitor.</td>
+														<td>29.99</td>
+													</tr>
+													<tr>
+														<td>Item Two</td>
+														<td>Vis ac commodo adipiscing arcu aliquet.</td>
+														<td>19.99</td>
+													</tr>
+													<tr>
+														<td>Item Three</td>
+														<td> Morbi faucibus arcu accumsan lorem.</td>
+														<td>29.99</td>
+													</tr>
+													<tr>
+														<td>Item Four</td>
+														<td>Vitae integer tempus condimentum.</td>
+														<td>19.99</td>
+													</tr>
+													<tr>
+														<td>Item Five</td>
+														<td>Ante turpis integer aliquet porttitor.</td>
+														<td>29.99</td>
+													</tr>
+												</tbody>
+												<tfoot>
+													<tr>
+														<td colspan="2"></td>
+														<td>100.00</td>
+													</tr>
+												</tfoot>
+											</table>
+										</div>
+
+										<h5>Alternate</h5>
+										<div class="table-wrapper">
+											<table class="alt">
+												<thead>
+													<tr>
+														<th>Name</th>
+														<th>Description</th>
+														<th>Price</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>Item One</td>
+														<td>Ante turpis integer aliquet porttitor.</td>
+														<td>29.99</td>
+													</tr>
+													<tr>
+														<td>Item Two</td>
+														<td>Vis ac commodo adipiscing arcu aliquet.</td>
+														<td>19.99</td>
+													</tr>
+													<tr>
+														<td>Item Three</td>
+														<td> Morbi faucibus arcu accumsan lorem.</td>
+														<td>29.99</td>
+													</tr>
+													<tr>
+														<td>Item Four</td>
+														<td>Vitae integer tempus condimentum.</td>
+														<td>19.99</td>
+													</tr>
+													<tr>
+														<td>Item Five</td>
+														<td>Ante turpis integer aliquet porttitor.</td>
+														<td>29.99</td>
+													</tr>
+												</tbody>
+												<tfoot>
+													<tr>
+														<td colspan="2"></td>
+														<td>100.00</td>
+													</tr>
+												</tfoot>
+											</table>
+										</div>
+									</section>
+
+									<section>
+										<h4>Buttons</h4>
+										<ul class="actions">
+											<li><a href="#" class="button primary">Primary</a></li>
+											<li><a href="#" class="button">Default</a></li>
+											<li><a href="#" class="button alt">Alternate</a></li>
+										</ul>
+										<ul class="actions">
+											<li><a href="#" class="button primary large">Large</a></li>
+											<li><a href="#" class="button">Default</a></li>
+											<li><a href="#" class="button alt small">Small</a></li>
+										</ul>
+										<ul class="actions fit">
+											<li><a href="#" class="button primary fit">Fit</a></li>
+											<li><a href="#" class="button fit">Fit</a></li>
+											<li><a href="#" class="button alt fit">Fit</a></li>
+										</ul>
+										<ul class="actions fit small">
+											<li><a href="#" class="button primary fit small">Fit + Small</a></li>
+											<li><a href="#" class="button fit small">Fit + Small</a></li>
+											<li><a href="#" class="button alt fit small">Fit + Small</a></li>
+										</ul>
+										<ul class="actions">
+											<li><a href="#" class="button primary icon solid fa-download">Icon</a></li>
+											<li><a href="#" class="button icon solid fa-download">Icon</a></li>
+											<li><a href="#" class="button alt icon solid fa-check">Icon</a></li>
+										</ul>
+										<ul class="actions">
+											<li><span class="button primary disabled">Primary</span></li>
+											<li><span class="button disabled">Default</span></li>
+											<li><span class="button alt disabled">Alternate</span></li>
+										</ul>
+									</section>
+
+									<section>
+										<h4>Form</h4>
+										<form method="post" action="#">
+											<div class="row gtr-uniform">
+												<div class="col-6 col-12-xsmall">
+													<input type="text" name="demo-name" id="demo-name" value="" placeholder="Name" />
+												</div>
+												<div class="col-6 col-12-xsmall">
+													<input type="email" name="demo-email" id="demo-email" value="" placeholder="Email" />
+												</div>
+												<div class="col-12">
+													<select name="demo-category" id="demo-category">
+														<option value="">- Category -</option>
+														<option value="1">Manufacturing</option>
+														<option value="1">Shipping</option>
+														<option value="1">Administration</option>
+														<option value="1">Human Resources</option>
+													</select>
+												</div>
+												<div class="col-4 col-12-medium">
+													<input type="radio" id="demo-priority-low" name="demo-priority" checked>
+													<label for="demo-priority-low">Low Priority</label>
+												</div>
+												<div class="col-4 col-12-medium">
+													<input type="radio" id="demo-priority-normal" name="demo-priority">
+													<label for="demo-priority-normal">Normal Priority</label>
+												</div>
+												<div class="col-4 col-12-medium">
+													<input type="radio" id="demo-priority-high" name="demo-priority">
+													<label for="demo-priority-high">High Priority</label>
+												</div>
+												<div class="col-6 col-12-medium">
+													<input type="checkbox" id="demo-copy" name="demo-copy">
+													<label for="demo-copy">Email me a copy of this message</label>
+												</div>
+												<div class="col-6 col-12-medium">
+													<input type="checkbox" id="demo-human" name="demo-human" checked>
+													<label for="demo-human">I am a human and not a robot</label>
+												</div>
+												<div class="col-12">
+													<textarea name="demo-message" id="demo-message" placeholder="Enter your message" rows="6"></textarea>
+												</div>
+												<div class="col-12">
+													<ul class="actions">
+														<li><input type="submit" value="Send Message" /></li>
+														<li><input type="reset" value="Reset" class="alt" /></li>
+													</ul>
+												</div>
+											</div>
+										</form>
+									</section>
+
+									<section>
+										<h4>Image</h4>
+										<h5>Fit</h5>
+										<span class="image fit"><img src="images/banner.jpg" alt="" /></span>
+										<div class="box alt">
+											<div class="row gtr-50 gtr-uniform">
+												<div class="col-4"><span class="image fit"><img src="images/pic01.jpg" alt="" /></span></div>
+												<div class="col-4"><span class="image fit"><img src="images/pic02.jpg" alt="" /></span></div>
+												<div class="col-4"><span class="image fit"><img src="images/pic03.jpg" alt="" /></span></div>
+												<div class="col-4"><span class="image fit"><img src="images/pic02.jpg" alt="" /></span></div>
+												<div class="col-4"><span class="image fit"><img src="images/pic03.jpg" alt="" /></span></div>
+												<div class="col-4"><span class="image fit"><img src="images/pic01.jpg" alt="" /></span></div>
+												<div class="col-4"><span class="image fit"><img src="images/pic03.jpg" alt="" /></span></div>
+												<div class="col-4"><span class="image fit"><img src="images/pic01.jpg" alt="" /></span></div>
+												<div class="col-4"><span class="image fit"><img src="images/pic02.jpg" alt="" /></span></div>
+											</div>
+										</div>
+										<h5>Left &amp; Right</h5>
+										<p><span class="image left"><img src="images/avatar.jpg" alt="" /></span>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent.</p>
+										<p><span class="image right"><img src="images/avatar.jpg" alt="" /></span>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent.</p>
+									</section>
+
+								</div>
+							</section>
+						-->
+
+					</div>
+
+				<!-- Footer -->
+					<section id="footer">
+						<div class="container">
+							<ul class="copyright">
+								<li>&copy; Mohamed-Lamine MESSAI. All rights reserved.</li><!--<li>Design: <a href="http://html5up.net">HTML5 UP</a></li>-->
+							</ul>
+						</div>
+					</section>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
