@@ -3326,3 +3326,5 @@ input, select, textarea {
 		width: 100%;
 		/*display: none;	*/
 	}
+	#col-md-2 { width: 100%; }
+
