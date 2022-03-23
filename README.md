@@ -1,2 +1,2 @@
-## [Maohamed-Lamine MESSAI's webpage](https://mohamed-messai.github.io/)
+## [Maohamed-Lamine MESSAI's webpage](https://mlm.github.io/)
 # mlm.github.io
