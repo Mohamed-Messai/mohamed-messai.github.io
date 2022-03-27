@@ -3332,7 +3332,7 @@ input, select, textarea {
    		margin-right: auto;
 	}
 	.image-main {
-		max-width : 100%;
+		max-width : 50%;
 		height : auto;
 	}
 
